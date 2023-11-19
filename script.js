@@ -1,4 +1,4 @@
-version ="1.5.3";
+version ="1.5.4";
 document.write("<title>CubeOS</title><meta name='apple-mobile-web-app-status-bar-style' content='black'><meta name='apple-mobile-web-app-capable' content='yes'><body style='color: #0f0; font-family: monospace; background-color: black;'>CubeOS Version <b>"+version+"</b><br/><span id='path'></span><input type='text' id='input' style='background-color: black; color: #0f0; font-family: monospace;'/><!--<button onclick='execute()' style='border: 1px solid #0f0; background-color: black; color: #0f0; font-family: monospace;'>Run</button>--><br/><br><div id='output'></div></body>");
 fileSystem = {"MAIN":{"password.key":"1337"}, "MSG":""}
 document.addEventListener('keydown', function(event) {
@@ -350,9 +350,21 @@ const helps = {"echo":"Usage: ECHO text<br>Outputs <i>text</i>",
                "exec":"Usage: EXEC jscode<br>Executes <i>jscode</i>",
                "ls":"Usage: LS<br>Shows all files",
                "shutdown":"Usage: SHUTDOWN<br>Shuts down CubeOS",
-               "easteregg":"You have to find that out by yourself! ;-)",
+               "easteregg":"You have to find out that by yourself! ;-)",
                "create":"Usage: CREATE filename<br>Creates the file <i>filename</i> in (MAIN)/",
-               "write":"Usage: WRITE A filename text<br>WRITE W file text<br>Writes <i>text</i> into <i>filename</i>. If mode is W, file content gets overrided. Not supported for .int files."
+               "write":"Usage: WRITE A filename text<br>WRITE W file text<br>Writes <i>text</i> into <i>filename</i>. If mode is W, file content gets overrided. Not supported for .int files.",
+               "fs":"Usage: FS LOAD id<br>FS SAVE id<br>FS VIEW<br>SAVE: Saves the complete file system to LocalStorage.<br>LOAD: Loads a complete file system from LocalStorage by specified <i>id</id><br>VIEW: Shows the complete file system as json string.",
+               "msg":"Usage: MSG SET message<br>MSG VIEW<br>MSG CLEAR<br>The message is shown when importing the file system with FS LOAD.",
+               "rm":"Usage: RM filename<br>Deletes the file <i>filename</i>",
+               "sysinfo":"Usage: SYSINFO<br>Shows information of CubeOS and the client (e. g. browser)",
+               "run":"Usage: RUN jsfile<br>Executes the code in a .js file and logs the result.",
+               "color":"Usage: COLOR color<br>Sets the text and background color.",
+               "reboot":"Usage: REBOOT<br>Reloads the page.",
+               "int":"Usage: INT + filename value<br>INT - filename value<br> INT SET filename value<br>Changes the value of a .int file.",
+               "cls":"Usage: CLS<br>Clears the screen.",
+               "edit":"Usage: EDIT filename<br>Opens a textarea with the contents of <i>filename</i>. The file can be saved with SHIFT + ^.",
+               "pm":"Usage: PM INSTALL package<br>PM REMOVE package<br>Installs or removes <i>package</i> (currently you can only uninstall the internet ;-)).",
+
                
               }
 
