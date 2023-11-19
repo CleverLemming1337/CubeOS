@@ -350,7 +350,9 @@ const helps = {"echo":"Usage: ECHO text<br>Outputs <i>text</i>",
                "exec":"Usage: EXEC jscode<br>Executes <i>jscode</i>",
                "ls":"Usage: LS<br>Shows all files",
                "shutdown":"Usage: SHUTDOWN<br>Shuts down CubeOS",
-               "easteregg":"You have to find that out by yourself! ;-)"
+               "easteregg":"You have to find that out by yourself! ;-)",
+               "create":"Usage: CREATE filename<br>Creates the file <i>filename</i> in (MAIN)/",
+               "write":"Usage: WRITE A filename text<br>WRITE W file text<br>Writes <i>text</i> into <i>filename</i>. If mode is W, file content gets overrided. Not supported for .int files."
                
               }
 
