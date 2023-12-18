@@ -1,5 +1,5 @@
-version ="1.5.6.2";
-const style = "body { caret-color: #0f0; caret-shape: underscore; color: #0f0; font-family: monospace; background-color: black } textarea {outline: none; background-color: black; border: 1px solid #0f0; border-radius: 0; height: 20em; width: 100%;} input { width: 80%; outline: none; border: none; color: #0f0; font-family: monospace; background-color: black;} button {color: green; font-family: monospace; border: 1px solid #0f0; border-radius: 0}"
+version ="1.6.0";
+const style = ".red {background-color: red;} .green {background-color: #0f0} .blue {background-color: #00f} body { caret-color: #0f0; caret-shape: underscore; color: #0f0; font-family: monospace; background-color: black } textarea {outline: none; background-color: black; border: 1px solid #0f0; border-radius: 0; height: 20em; width: 100%;} input { width: 80%; outline: none; border: none; color: #0f0; font-family: monospace; background-color: black;} button {color: green; font-family: monospace; border: 1px solid #0f0; border-radius: 0} a{color: #0f0; text-decoration-color: #0f0;}"
 document.write("<style>"+style+"</style><title>CubeOS</title><link rel='apple-touch-icon' href='Logo.png'><meta name='apple-mobile-web-app-status-bar-style' content='black'><meta name='apple-mobile-web-app-capable' content='yes'><body>CubeOS Version <b>"+version+"</b><br/><span id='path'></span><input placeholder='command...' type='text' id='input' /><!--<button onclick='execute()' style='border: 1px solid #0f0; background-color: black; color: #0f0; font-family: monospace;'>Run</button>--><br/><br><div id='output'></div></body>");
 fileSystem = {"MAIN":{"password.key":"1337"}, "MSG":""}
 document.addEventListener('keydown', function(event) {
@@ -12,8 +12,14 @@ document.addEventListener('keydown', function(event) {
       warn("You are editing a file. Please save it before executing another command.")
     }*/
   }
+  else if(event.key === "ArrowUp") {
+    document.getElementById("input").value = history[history.length-1];
+  }
+  else if(event.key === "ArrowDown") {
+    document.getElementById("input").value = "";
+  }
 });
-var history = []
+let history = []
 const searchParams = new URLSearchParams(window.location.search);
 if (searchParams.has('command')) {
   
@@ -32,7 +38,7 @@ realPath = ["(MAIN)/"]
 
 
 function execute(params) {
-  history.concat([params.join(" ")])
+  history.push(params.join(" "))
   document.getElementById("input").placeholder = "";
   switch (params[0].toLowerCase()) {
     case "format": {
@@ -40,8 +46,9 @@ function execute(params) {
       break;
     }
     case "history": {
-      for(i in history) {
-        log(i, end="")
+      log("")
+      for(var i = 0; i<history.length; i++) {
+        log(i+1+". "+history[i], end="<br>")
       }
       break;
     }
@@ -164,7 +171,7 @@ function execute(params) {
     }
     case "easteregg": {
       if(params[1] === "1337"){
-        log("Easteregg!");
+        log("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='blue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br>&nbsp;&nbsp;&nbsp;<span class='blue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br><span class='blue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br><span class='red'>&nbsp;&nbsp;&nbsp;</span><span class='blue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class='green'>&nbsp;&nbsp;&nbsp;</span><br><span class='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class='blue'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class='green'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br><span class='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class='green'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br><span class='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class='green'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br>&nbsp;&nbsp;&nbsp;<span class='red'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class='green'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='red'>&nbsp;&nbsp;&nbsp;</span><span class='green'>&nbsp;&nbsp;&nbsp;</span><br>")
       }
     
       else {
@@ -174,7 +181,7 @@ function execute(params) {
     }
     case "shutdown": {
       log("Shutting down...");
-      setTimeout(function() {document.documentElement.innerHTML="CubeOS was shut down."}, 1000);
+      setTimeout(function() {document.documentElement.innerHTML="CubeOS was shut down.<br><img src='Logo.png'/>"}, 1000);
       break;
     }
     case "write": {
@@ -334,12 +341,12 @@ function execute(params) {
       break;
     }
     case "about": {
-      log("Welcome to CubeOS!<br>This is a computer simuation. You can create files with CREATE, edit them with WRITE, delete them with RM or view them with VIEW. You can also save the file system in localStorage with the FS command.<br>For more help use HELP or HELP command.<br><br>Here are some special features of CubeOS:<br>- There are .int files that can only store integers. To edit them use the INT command.<br>- CubeOS doesn't have directories.<br>- You can create .js files and execute them with RUN<br><br>100% made with JavaScript by CleverLemming1337.")
+      log("Welcome to CubeOS!<br>This is a computer simuation. You can create files with CREATE, edit them with WRITE, delete them with RM or view them with VIEW. You can also save the file system in localStorage with the FS command.<br>Press arrow up to input the previous command.<br>For more help use HELP or HELP command.<br><br>Here are some special features of CubeOS:<br>- There are .int files that can only store integers. To edit them use the INT command.<br>- CubeOS doesn't have directories.<br>- You can create .js files and execute them with RUN<br><br>100% made with JavaScript by CleverLemming1337.<br>For more info see <a href='https://github.com/CleverLemming1337/CubeOS/tree/dev'>this repo on github</a>")
       break;
     }
     case "help": {
       if(params.length == 1) {
-      log("Available commands:<br>- ECHO text<br>- FORMAT drive<br>- HELP<br>- HELP command<br>- VIEW file<br>- EXEC jscode<br>- LS<br>- SHUTDOWN<br>- EASTEREGG<br>- CREATE filename<br>- WRITE { A | W } file text<br>- FS { LOAD | SAVE } id<br>- FS VIEW<br>- MSG SET message<br>- MSG { CLEAR | VIEW }<br>- RM filename<br>- SYSINFO<br>- RUN jsfile<br>- COLOR color<br>- REBOOT<br>- INT { + | - | SET } file number<br>- CLS<br>- EDIT file<br>- PM { INSTALL | REMOVE } package<br>For more help type HELP command");
+      log("Available commands:<br>- ECHO text<br>- FORMAT drive<br>- HELP<br>- HELP command<br>- VIEW file<br>- EXEC jscode<br>- LS<br>- SHUTDOWN<br>- EASTEREGG<br>- CREATE filename<br>- WRITE { A | W } file text<br>- FS { LOAD | SAVE } id<br>- FS VIEW<br>- MSG SET message<br>- MSG { CLEAR | VIEW }<br>- RM filename<br>- SYSINFO<br>- RUN jsfile<br>- COLOR color<br>- REBOOT<br>- INT { + | - | SET } file number<br>- CLS<br>- EDIT file<br>- PM { INSTALL | REMOVE } package<br>- HISTORY<br>For more help type HELP command");
       }
       else {
         log(helps[params[1].toLowerCase()]);
@@ -389,7 +396,7 @@ const helps = {"echo":"Usage: ECHO text<br>Outputs <i>text</i>",
                "edit":"Usage: EDIT filename<br>Opens a textarea with the contents of <i>filename</i>. The file can be saved with SHIFT + ^.",
                "pm":"Usage: PM INSTALL package<br>PM REMOVE package<br>Installs or removes <i>package</i> (currently you can only uninstall the internet ;-)).",
                "view":"Usage: VIEW file<br>Prints the content of <i>file</i>",
+               "history":"Usage: HISTORY<br>Shows all commands executed since booting",
 
                
 }
-
