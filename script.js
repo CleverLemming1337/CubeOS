@@ -1,13 +1,19 @@
-version ="1.5.4";
-document.write("<title>CubeOS</title><link rel='apple-touch-icon' href='Logo.png'><meta name='apple-mobile-web-app-status-bar-style' content='black'><meta name='apple-mobile-web-app-capable' content='yes'><body style='color: #0f0; font-family: monospace; background-color: black;'>CubeOS Version <b>"+version+"</b><br/><span id='path'></span><input type='text' id='input' style='background-color: black; color: #0f0; font-family: monospace;'/><!--<button onclick='execute()' style='border: 1px solid #0f0; background-color: black; color: #0f0; font-family: monospace;'>Run</button>--><br/><br><div id='output'></div></body>");
+version ="1.5.6.2";
+const style = "body { caret-color: #0f0; caret-shape: underscore; color: #0f0; font-family: monospace; background-color: black } textarea {outline: none; background-color: black; border: 1px solid #0f0; border-radius: 0; height: 20em; width: 100%;} input { width: 80%; outline: none; border: none; color: #0f0; font-family: monospace; background-color: black;} button {color: green; font-family: monospace; border: 1px solid #0f0; border-radius: 0}"
+document.write("<style>"+style+"</style><title>CubeOS</title><link rel='apple-touch-icon' href='Logo.png'><meta name='apple-mobile-web-app-status-bar-style' content='black'><meta name='apple-mobile-web-app-capable' content='yes'><body>CubeOS Version <b>"+version+"</b><br/><span id='path'></span><input placeholder='command...' type='text' id='input' /><!--<button onclick='execute()' style='border: 1px solid #0f0; background-color: black; color: #0f0; font-family: monospace;'>Run</button>--><br/><br><div id='output'></div></body>");
 fileSystem = {"MAIN":{"password.key":"1337"}, "MSG":""}
 document.addEventListener('keydown', function(event) {
-  if (event.key === 'Enter'&&document.getElementById('editor')==null) {
-    let params = document.getElementById("input").value.split("&");
-    execute(params);
+  if (event.key === 'Enter') {
+    if (document.getElementById('editor')==null) {
+      let params = document.getElementById("input").value.split(" ");
+      execute(params);
+    }/*
+    else {
+      warn("You are editing a file. Please save it before executing another command.")
+    }*/
   }
 });
-
+var history = []
 const searchParams = new URLSearchParams(window.location.search);
 if (searchParams.has('command')) {
   
@@ -26,10 +32,17 @@ realPath = ["(MAIN)/"]
 
 
 function execute(params) {
-  
+  history.concat([params.join(" ")])
+  document.getElementById("input").placeholder = "";
   switch (params[0].toLowerCase()) {
     case "format": {
       log("Formatting "+params[1]+"...");
+      break;
+    }
+    case "history": {
+      for(i in history) {
+        log(i, end="")
+      }
       break;
     }
     case "run": {
@@ -68,19 +81,22 @@ function execute(params) {
 
 
    case "edit": {
+      document.getElementById("input").placeholder = "Waiting for editor to save..."
       if (params[1].endsWith('.int')){
         error("Not available for .int files");
         break;
       }
 
 
-      log("<div id='editorLog'>Use ° to save<br><textarea id='editor' style='background-color: black; color: #0f0; font-family: monospace; height: 20em; width: 100%; border: 1px solid #0f0; border-radius: 0;'>"+fileSystem["MAIN"][params[1]]+"</textarea></div>");
+      log("<div id='editorLog'>Use ° to save<br><textarea id='editor' style='background-color: black; color: #0f0; font-family: monospace; height: 20em; width: 100%; border: 1px solid #0f0; border-radius: 0;'>"+fileSystem["MAIN"][params[1]]+"</textarea><button id='saveButton' style='background-color: black; color: #0f0; font-family: monospace; border: 1px solid #0f0; border-radius: 0;'>Save</button></div>");
       document.getElementById('editor').addEventListener('keydown', function(event){
         if (event.key === "°") {
-          fileSystem["MAIN"][params[1]] = document.getElementById('editor').value;
-          document.getElementById('editorLog').innerHTML = "Edited "+params[1];
+          saveEditor(params);
         }
       
+      });
+      document.getElementById('saveButton').addEventListener('click', function(){
+          saveEditor(params);
       });
       break;
     }
@@ -122,9 +138,12 @@ function execute(params) {
 
         path.innerHTML = "(" + realPath.join("/") + ")/ $"; // update the path
         break;
-      }
+    }
     case "view": {
-
+      if (params.length < 2) {
+        error("Please specify a filename.")
+        break
+      }
       log(fileSystem["MAIN"][params[1]].replace("<", "&lt;").replace(">", "&gt;").replace("\n","<br>"));
       break;
     }
@@ -315,12 +334,12 @@ function execute(params) {
       break;
     }
     case "about": {
-      log("Welcome to CubeOS!<br>This is a computer simuation. You can create files with CREATE, edit them with WRITE, delete them with RM or view them with VIEW. You can also save the file system in localStorage with the FS command.<br>For more help use HELP or HELP command.<br><br>Here are some special features of CubeOS:<br>- You seperate command parameters with & (e.g. echo&Hello World!)<br>- There are .int files that can only store integers. To edit them use the INT command.<br>- CubeOS doesn't have directories.<br>- You can create .js files and execute them with RUN<br><br>100% made with JavaScript.")
+      log("Welcome to CubeOS!<br>This is a computer simuation. You can create files with CREATE, edit them with WRITE, delete them with RM or view them with VIEW. You can also save the file system in localStorage with the FS command.<br>For more help use HELP or HELP command.<br><br>Here are some special features of CubeOS:<br>- There are .int files that can only store integers. To edit them use the INT command.<br>- CubeOS doesn't have directories.<br>- You can create .js files and execute them with RUN<br><br>100% made with JavaScript by CleverLemming1337.")
       break;
     }
     case "help": {
       if(params.length == 1) {
-      log("Available commands:<br>- ECHO text<br>- FORMAT drive<br>- HELP<br>- HELP command<br>- EXEC jscode<br>- LS<br>- SHUTDOWN<br>- EASTEREGG<br>- CREATE filename<br>- WRITE { A | W } file text<br>- FS { LOAD | SAVE } id<br>- FS VIEW<br>- MSG SET message<br>- MSG { CLEAR | VIEW }<br>- RM filename<br>- SYSINFO<br>- RUN jsfile<br>- COLOR color<br>- REBOOT<br>- INT { + | - | SET } file number<br>- CLS-<br>- EDIT file<br>- PM { INSTALL | REMOVE } package<br><br>Seperate parameters with &");
+      log("Available commands:<br>- ECHO text<br>- FORMAT drive<br>- HELP<br>- HELP command<br>- VIEW file<br>- EXEC jscode<br>- LS<br>- SHUTDOWN<br>- EASTEREGG<br>- CREATE filename<br>- WRITE { A | W } file text<br>- FS { LOAD | SAVE } id<br>- FS VIEW<br>- MSG SET message<br>- MSG { CLEAR | VIEW }<br>- RM filename<br>- SYSINFO<br>- RUN jsfile<br>- COLOR color<br>- REBOOT<br>- INT { + | - | SET } file number<br>- CLS<br>- EDIT file<br>- PM { INSTALL | REMOVE } package<br>For more help type HELP command");
       }
       else {
         log(helps[params[1].toLowerCase()]);
@@ -334,8 +353,8 @@ function execute(params) {
   }
   document.getElementById("input").value = ""
 }
-function log(text) {
-  document.getElementById("output").innerHTML = text+"<br/>-----<br>"+ document.getElementById("output").innerHTML;
+function log(text, end="<br>-----<br>") {
+  document.getElementById("output").innerHTML = text+end+ document.getElementById("output").innerHTML;
 }
 function error(text) {
   log("<div style='color: #f00;'>Error: "+text+"</div>")
@@ -344,6 +363,11 @@ function warn(text) {
   log("<div style='color: #ff0;'>Warning: "+text+"</div>");
 }
 
+function saveEditor(params){
+  fileSystem["MAIN"][params[1]] = document.getElementById('editor').value;
+  document.getElementById('editorLog').innerHTML = "Edited "+params[1];
+  document.getElementById('input').placeholder = "";
+}
 const helps = {"echo":"Usage: ECHO text<br>Outputs <i>text</i>",
                "format":"Usage: FORMAT drive<br>Formats <i>drive</i>",
                "help":"Usage: HELP command, HELP<br>Lists all available commands or shows help to <i>command</i> if given",
@@ -364,7 +388,8 @@ const helps = {"echo":"Usage: ECHO text<br>Outputs <i>text</i>",
                "cls":"Usage: CLS<br>Clears the screen.",
                "edit":"Usage: EDIT filename<br>Opens a textarea with the contents of <i>filename</i>. The file can be saved with SHIFT + ^.",
                "pm":"Usage: PM INSTALL package<br>PM REMOVE package<br>Installs or removes <i>package</i> (currently you can only uninstall the internet ;-)).",
+               "view":"Usage: VIEW file<br>Prints the content of <i>file</i>",
 
                
-              }
+}
 
