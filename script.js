@@ -1,4 +1,4 @@
-version ="1.7.2";
+version ="1.7.3";
 const style = ".red {background-color: red;} .green {background-color: #0f0} .blue {background-color: #00f} body { caret-color: #0f0; caret-shape: underscore; color: #0f0; font-family: monospace; background-color: black } textarea {outline: none; background-color: black; border: 1px solid #0f0; border-radius: 0; height: 20em; width: 100%;} input { width: 80%; outline: none; border: none; color: #0f0; font-family: monospace; background-color: black;} button {color: green; font-family: monospace; border: 1px solid #0f0; border-radius: 0} a{color: #0f0; text-decoration-color: #0f0;}"
 document.write("<style>"+style+"</style><title>CubeOS</title><link rel='apple-touch-icon' href='Logo.png'><meta name='apple-mobile-web-app-status-bar-style' content='black'><meta name='apple-mobile-web-app-capable' content='yes'><body>CubeOS Version <b>"+version+"</b><br/><span id='path'></span><input placeholder='command...' type='text' id='input' /><!--<button onclick='execute()' style='border: 1px solid #0f0; background-color: black; color: #0f0; font-family: monospace;'>Run</button>--><br/><br><div id='output'></div></body>");
 fileSystem = {"MAIN":{"password.key":"1337"}, "MSG":""}
@@ -13,13 +13,26 @@ document.addEventListener('keydown', function(event) {
     }*/
   }
   else if(event.key === "ArrowUp") {
-    document.getElementById("input").value = history[history.length-1];
+    historyIndex += 1
+    var content = history[history.length-historyIndex];
+    if(content != undefined) {
+      document.getElementById("input").value = content;
+    }
   }
   else if(event.key === "ArrowDown") {
-    document.getElementById("input").value = "";
+    if(historyIndex){
+      historyIndex-=1
+      if(historyIndex>0) {
+        document.getElementById("input").value = history[history.length-historyIndex];
+      }
+      else {
+        document.getElementById("input").value = "";
+      }
+    }
   }
 });
 let history = []
+let historyIndex = 0
 const searchParams = new URLSearchParams(window.location.search);
 if (searchParams.has('command')) {
   let params = searchParams.get('command').split("/")
