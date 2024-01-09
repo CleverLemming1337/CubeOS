@@ -31,12 +31,13 @@ document.addEventListener('keydown', function(event) {
     }
   }
 });
+warn("CubeOS will be renamed soon");
 let history = []
 let historyIndex = 0
 const searchParams = new URLSearchParams(window.location.search);
 if (searchParams.has('command')) {
   let params = searchParams.get('command').split("/")
-  if(params[0]!=="exec"){
+  if(params[0].toLowerCase()!=="exec"){
   execute(params);
   }
   else {
