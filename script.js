@@ -138,28 +138,14 @@ function execute(params) {
     }
     case "cd": {
         error("Out of order")
-        break;
+        break
         let targetPath = params[1];
-        let fullPath = targetPath.split('.'); 
         let currentDir = fileSystem["MAIN"];
-
-        for (let i = 0; i < fullPath.length; i++) {
-          if (fullPath[i] === "..") {
-            currentDir = fileSystem["MAIN"];
-            realPath.pop(); // Go up one directory
-            for (let j = 0; j < realPath.length; j++) {
-              currentDir = currentDir[realPath[j]];
-            }
-          } else {
-            if(currentDir[fullPath[i]] && currentDir[fullPath[i]].hasOwnProperty('.dir')) {
-              currentDir = currentDir[fullPath[i]];
-              realPath.push(fullPath[i]);
-            } else {
-              error("Directory does not exist");
-              return;
-            }
-          }
+        if(!currentDir[targetPath].constructor == Object) {
+          error("Not a directory")
+          break
         }
+        
 
         path.innerHTML = "(" + realPath.join("/") + ")/ $"; // update the path
         break;
@@ -203,6 +189,7 @@ function execute(params) {
       break;
     }
     case "write": {
+      warn("This command is deprecated. Use edit instead.")
       if(params[2].endsWith(".int")) {
         error("Cannot write text to .int file. Use INT command.");
         break;
@@ -316,8 +303,15 @@ function execute(params) {
     }
     case "ls": {
       text="<table>"
+      let value = ""
       for(let i in fileSystem["MAIN"]){
-        text+="<tr><td>"+i+"</td><td>"+fileSystem["MAIN"][i].length+"</td></tr>"
+        if (fileSystem["MAIN"][i].constructor === Object) { // check if dictionary (=dir)
+          value = "<DIR>"
+        }
+        else {
+          value = fileSystem["MAIN"][i].length
+        }
+        text+=`<tr><td>${i}</td><td>${value}</td></tr>`
       }
       text+="</table>"
       log(text);
@@ -364,12 +358,34 @@ function execute(params) {
     }
     case "help": {
       if(params.length == 1) {
-      log("Available commands:<br>- ECHO text<br>- FORMAT drive<br>- HELP<br>- HELP command<br>- VIEW file<br>- EXEC jscode<br>- LS<br>- SHUTDOWN<br>- EASTEREGG<br>- CREATE filename<br>- WRITE { A | W } file text<br>- FS { LOAD | SAVE } id<br>- FS VIEW<br>- MSG SET message<br>- MSG { CLEAR | VIEW }<br>- RM filename<br>- SYSINFO<br>- RUN jsfile<br>- COLOR color<br>- REBOOT<br>- INT { + | - | SET } file number<br>- CLS<br>- EDIT file<br>- PM { INSTALL | REMOVE } package<br>- HISTORY<br>For more help type HELP command");
+      log("Available commands:<br>- ECHO text<br>- FORMAT drive<br>- HELP<br>- HELP command<br>- VIEW file<br>- EXEC jscode<br>- LS<br>- SHUTDOWN<br>- EASTEREGG<br>- CREATE filename<br>- WRITE { A | W } file text<br>- FS { LOAD | SAVE } id<br>- FS VIEW<br>- MSG SET message<br>- MSG { CLEAR | VIEW }<br>- RM filename<br>- SYSINFO<br>- RUN jsfile<br>- COLOR color<br>- REBOOT<br>- INT { + | - | SET } file number<br>- CLS<br>- EDIT file<br>- PM { INSTALL | REMOVE } package<br>- HISTORY<br>- HTTP method url [body]<br><br>For more help type HELP command");
       }
       else {
         log(helps[params[1].toLowerCase()]);
       }
       break;
+    }
+    case "http": {
+      const methods = ["GET", "POST", "PUT", "DELETE"]
+      if (!methods.includes(params[1])) {
+        error("Not supported")
+        break
+      } 
+      else {
+        const xhr = new XMLHttpRequest();
+        log(`Method: ${params[1]}, URL: ${params[2]}`)
+        xhr.open(params[1], params[2]);
+        xhr.send(params[3]);
+        xhr.onload = () => {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            const data = xhr.response;
+            log(`Response from ${params[2]}: ${JSON.stringify(data)}`);
+          } else {
+            error(xhr.status);
+          }
+        };
+      }
+      break
     }
     default: {
       error("Unknown command: "+params[0])
@@ -415,6 +431,7 @@ const helps = {"echo":"Usage: ECHO text<br>Outputs <i>text</i>",
                "pm":"Usage: PM INSTALL package<br>PM REMOVE package<br>Installs or removes <i>package</i> (currently you can only uninstall the internet ;-)).",
                "view":"Usage: VIEW file<br>Prints the content of <i>file</i>",
                "history":"Usage: HISTORY<br>Shows all commands executed since booting",
+               "http":"Usage: HTTP method url [body]<br>Makes a http request."
 
                
 }
