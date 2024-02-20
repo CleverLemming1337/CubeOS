@@ -1,7 +1,11 @@
-version ="1.7.3";
+version ="1.7.4";
 const style = ".red {background-color: red;} .green {background-color: #0f0} .blue {background-color: #00f} body { caret-color: #0f0; caret-shape: underscore; color: #0f0; font-family: monospace; background-color: black } textarea {outline: none; background-color: black; border: 1px solid #0f0; border-radius: 0; height: 20em; width: 100%;} input { width: 80%; outline: none; border: none; color: #0f0; font-family: monospace; background-color: black;} button {color: green; font-family: monospace; border: 1px solid #0f0; border-radius: 0} a{color: #0f0; text-decoration-color: #0f0;}"
-document.write("<style>"+style+"</style><title>CubeOS</title><link rel='apple-touch-icon' href='Logo.png'><meta name='apple-mobile-web-app-status-bar-style' content='black'><meta name='apple-mobile-web-app-capable' content='yes'><body>CubeOS Version <b>"+version+"</b><br/><span id='path'></span><input placeholder='command...' type='text' id='input' /><!--<button onclick='execute()' style='border: 1px solid #0f0; background-color: black; color: #0f0; font-family: monospace;'>Run</button>--><br/><br><div id='output'></div></body>");
+document.write("<style>"+style+"</style><title>CubeOS</title><link rel='apple-touch-icon' href='Logo.png'><meta name='apple-mobile-web-app-status-bar-style' content='black'><meta name='apple-mobile-web-app-capable' content='yes'><body id='CubeOS'>CubeOS Version <b>"+version+"</b><br/><span id='path'></span><input placeholder='command...' type='text' id='input' /><!--<button onclick='execute()' style='border: 1px solid #0f0; background-color: black; color: #0f0; font-family: monospace;'>Run</button>--><br/><br><div id='output'></div></body>");
 fileSystem = {"MAIN":{"password.key":"1337"}, "MSG":""}
+var packages = ["CubeOS"];
+
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+
 document.addEventListener('keydown', function(event) {
   if (event.key === 'Enter') {
     if (document.getElementById('editor')==null) {
@@ -55,7 +59,7 @@ path.innerHTML = "(MAIN)/ $"
 realPath = ["(MAIN)/"]
 
 
-function execute(params) {
+async function execute(params) {
   history.push(params.join(" "))
   document.getElementById("input").placeholder = "";
   switch (params[0].toLowerCase()) {
@@ -88,15 +92,42 @@ function execute(params) {
             error("Network connection not found. Rebooting...");
             setTimeout(function() {location.reload()}, 3000);
           }, 5000);
+          break;
         }
-      
-        else {
-          error("Package not found");
+        let index = packages.findIndex((element) => element === params[2])
+        if (index == -1) {
+          error("Package not found")
+          break
         }
+        document.getElementById(packages.pop(index)).remove()
+        log(`Successfully removed ${params[2]}.`);
+        break;
+        
       }
 
       else if (params[1] === "install") {
-          error("You cannot install any packages yet.");
+        log("Reading package lists...", end="<br>")
+        await sleep(500)
+        for(var i = 0; i<10; i++) {
+          log(`${i+1}: Downloading...`, end="<br>")
+          await sleep(200)
+        }
+        for(var i = 0; i<10; i++) {
+          log(`${i+1}: Extracting...`, end="<br>")
+          await sleep(300)
+        }
+        packages.push(params[2])
+        var cdn = document.createElement("script");
+        cdn.src = params[2];
+        cdn.id = params[2];
+        document.body.appendChild(cdn);
+        log(`Successfully installed ${params[2]}.`)
+      }
+      else if (params[1] === "ls") {
+        log("")
+        for(var i in packages) {
+          log(`source: ${packages[i]}`, end="<br>");
+        }
       }
       else {
         error("Invalid option")
@@ -412,7 +443,7 @@ const helps = {"echo":"Usage: ECHO text<br>Outputs <i>text</i>",
                "int":"Usage: INT + filename value<br>INT - filename value<br> INT SET filename value<br>Changes the value of a .int file.",
                "cls":"Usage: CLS<br>Clears the screen.",
                "edit":"Usage: EDIT filename<br>Opens a textarea with the contents of <i>filename</i>. The file can be saved with SHIFT + ^.",
-               "pm":"Usage: PM INSTALL package<br>PM REMOVE package<br>Installs or removes <i>package</i> (currently you can only uninstall the internet ;-)).",
+               "pm":"Usage: PM INSTALL package<br>PM REMOVE package<br>Installs or removes <i>package</i> (cdn as script-tag).",
                "view":"Usage: VIEW file<br>Prints the content of <i>file</i>",
                "history":"Usage: HISTORY<br>Shows all commands executed since booting",
 
