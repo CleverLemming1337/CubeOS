@@ -106,22 +106,29 @@ async function execute(params) {
       }
 
       else if (params[1] === "install") {
-        log("Reading package lists...", end="<br>")
-        await sleep(500)
-        for(var i = 0; i<10; i++) {
-          log(`${i+1}: Downloading...`, end="<br>")
-          await sleep(200)
-        }
-        for(var i = 0; i<10; i++) {
-          log(`${i+1}: Extracting...`, end="<br>")
-          await sleep(300)
+        if(packages.includes(params[2])) {
+          log(`Package ${params[2]} already installed.`)
+          break;
         }
         packages.push(params[2])
+        
+        let count = Math.floor(Math.random() * 10) + 10
+        
+        log("Reading package lists...")
+        await sleep(2000)
+        for(var i = 0; i<count; i++) {
+          log(`${i+1}: Downloading...`, end="<br>")
+          await sleep(Math.floor(Math.random()*200)+50)
+        }
+        for(var i = 0; i<count; i++) {
+          log(`${i+1}: Extracting...`, end="<br>")
+          await sleep(Math.floor(Math.random()*200)+20)
+        }
         var cdn = document.createElement("script");
         cdn.src = params[2];
         cdn.id = params[2];
         document.body.appendChild(cdn);
-        log(`Successfully installed ${params[2]}.`)
+        log(`Successfully installed ${params[2]}.`, end="<br>")
       }
       else if (params[1] === "ls") {
         log("")
