@@ -75,6 +75,7 @@ async function execute(params) {
       break;
     }
     case "asteroid": {
+      document.body.style.backgroundColor = "grey";
       eval(asteroid);
       break;
     }
