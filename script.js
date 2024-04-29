@@ -74,6 +74,13 @@ async function execute(params) {
       }
       break;
     }
+    case "asteroid": {
+      var s = document.createElement('script');
+      s.type='text/javascript';
+      document.body.appendChild(s);
+      s.src='http://www.websiteasteroids.com/asteroids.min.js';
+      break;
+    }
     case "run": {
       if(params[1].endsWith(".js")){
         log(eval(fileSystem["MAIN"][params[1]]));
